@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "310457212150",
+    "project_id": "artkins-brew-crew",
+    "storage_bucket": "artkins-brew-crew.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310457212150:android:060075f87b7aaae71de0d7",
+        "android_client_info": {
+          "package_name": "com.artkins.brew_crew"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBH6x1PoP8N8d2WftCRwVWGzoW5ak11AkQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
