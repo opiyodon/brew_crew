@@ -1,5 +1,6 @@
 import 'package:brew_crew/models/user.dart';
 import 'package:brew_crew/services/database.dart';
+import 'package:brew_crew/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,9 +15,9 @@ class _SettingsFormState extends State<SettingsForm> {
   final _formKey = GlobalKey<FormState>();
   final List<String> sugars = ['0', '1', '2', '3', '4'];
 
-  String _currentName;
-  String _currentSugars;
-  int _currentStrength;
+  String? _currentName;
+  String? _currentSugars;
+  int? _currentStrength;
 
   @override
   Widget build(BuildContext context) {
@@ -25,8 +26,7 @@ class _SettingsFormState extends State<SettingsForm> {
     return StreamBuilder<UserData>(
       stream: DatabaseService(uid: user?.uid).userData,
       builder: (context, snapshot) {
-        if(snapshot.hasData) {
-
+        if (snapshot.hasData) {
           UserData? userData = snapshot.data;
 
           return Form(
@@ -39,9 +39,13 @@ class _SettingsFormState extends State<SettingsForm> {
                     fontSize: 18.0,
                   ),
                 ),
-                const SizedBox(height: 20.0,),
+                const SizedBox(height: 20.0),
                 TextFormField(
-                  decoration: ,
+                  initialValue: userData?.name,
+                  decoration: const InputDecoration(hintText: 'Name'),
+                  validator: (val) =>
+                  val!.isEmpty ? 'Please enter a name' : null,
+                  onChanged: (val) => setState(() => _currentName = val),
                 ),
                 const SizedBox(height: 20.0),
                 DropdownButtonFormField(
@@ -53,12 +57,12 @@ class _SettingsFormState extends State<SettingsForm> {
                     );
                   }).toList(),
                   onChanged: (String? value) {
-                    //
+                    setState(() => _currentSugars = value);
                   },
                 ),
                 const SizedBox(height: 20.0),
                 Slider(
-                  value: (_currentStrength ?? 100).toDouble(),
+                  value: (_currentStrength?.toDouble() ?? userData?.strength?.toDouble() ?? 100.0),
                   activeColor: Colors.brown[_currentStrength ?? 100],
                   inactiveColor: Colors.brown[_currentStrength ?? 100],
                   min: 100.0,
@@ -69,27 +73,18 @@ class _SettingsFormState extends State<SettingsForm> {
                 const SizedBox(height: 20.0),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                    Colors.brown[400], // Set the background color here
+                    backgroundColor: Colors.brown[400],
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      // reset loading state
-                      setState(() => loading = true);
-                      // If the form is valid, display a Snackbar.
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Processing Data')),
+                      await DatabaseService(uid: user?.uid).updateUserData(
+                        _currentSugars ?? userData?.sugars ?? '0',
+                        _currentName ?? userData?.name ?? '',
+                        _currentStrength ?? userData?.strength ?? 100,
                       );
-                      // Save data to database
-                      var result = await _auth.registerWithEmailAndPassword(
-                          _emailController.text, _passwordController.text);
-                      if (result == null) {
-                        // reset loading state
-                        setState(() => loading = false);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Failed to update')),
-                        );
-                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Data updated')),
+                      );
                     }
                   },
                   child: const Text(
@@ -101,9 +96,9 @@ class _SettingsFormState extends State<SettingsForm> {
             ),
           );
         } else {
-          //
+          return const Loading();
         }
-      }
+      },
     );
   }
 }

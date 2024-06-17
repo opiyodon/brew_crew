@@ -13,13 +13,14 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     void showSettingsPanel() {
       showModalBottomSheet(
         context: context,
         builder: (context) {
           return Container(
             padding:
-                const EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
+            const EdgeInsets.symmetric(vertical: 20.0, horizontal: 60.0),
             child: const SettingsForm(),
           );
         },
@@ -50,10 +51,10 @@ class Home extends StatelessWidget {
         ),
         body: Container(
           decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/coffee_bg.png'),
-              fit: BoxFit.cover,
-            )
+              image: DecorationImage(
+                image: AssetImage('assets/coffee_bg.png'),
+                fit: BoxFit.cover,
+              )
           ),
           child: const BrewList(),
         ),
