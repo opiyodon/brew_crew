@@ -2,15 +2,15 @@ import 'package:brew_crew/services/auth.dart';
 import 'package:brew_crew/shared/loading.dart';
 import 'package:flutter/material.dart';
 
-class SignIn extends StatefulWidget {
+class Register extends StatefulWidget {
   final Function toggleView;
-  const SignIn({super.key, required this.toggleView});
+  const Register({super.key, required this.toggleView});
 
   @override
-  State<SignIn> createState() => _SignInState();
+  State<Register> createState() => _RegisterState();
 }
 
-class _SignInState extends State<SignIn> {
+class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool loading = false;
@@ -34,7 +34,7 @@ class _SignInState extends State<SignIn> {
       appBar: AppBar(
         backgroundColor: Colors.brown[400],
         elevation: 0.0,
-        title: const Text('Sign In to Artkins Brew Crew'),
+        title: const Text('Sign Up to Artkins Brew Crew'),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
@@ -70,20 +70,20 @@ class _SignInState extends State<SignIn> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Processing Data')),
                     );
-                    // Sign in to database
-                    var result = await _auth.signInWithEmailAndPassword(
+                    // Save data to database
+                    var result = await _auth.registerWithEmailAndPassword(
                         _emailController.text, _passwordController.text);
                     if (result == null) {
                       // reset loading state
                       setState(() => loading = false);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Failed to sign in')),
+                        const SnackBar(content: Text('Failed to register')),
                       );
                     }
                   }
                 },
                 child: const Text(
-                  'Sign In',
+                  'Register',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -91,7 +91,7 @@ class _SignInState extends State<SignIn> {
                 onPressed: () {
                   widget.toggleView();
                 },
-                child: const Text('Don\'t have an account? Register here'),
+                child: const Text('Already have an account? Sign in here'),
               ),
             ],
           ),
