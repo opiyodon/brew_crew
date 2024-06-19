@@ -1,12 +1,10 @@
 import 'dart:io';
-import 'dart:async';
-import 'package:brew_crew/services/database.dart';
-import 'package:image/image.dart' as img;
 import 'package:brew_crew/services/auth.dart';
 import 'package:brew_crew/shared/loading.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/material.dart';
+import 'package:image/image.dart' as img;
+import 'package:image_picker/image_picker.dart';
 
 class Register extends StatefulWidget {
   final Function toggleView;
@@ -49,26 +47,40 @@ class _RegisterState extends State<Register> {
 
   Future<File> _resizeImage(File file) async {
     final bytes = await file.readAsBytes();
-    img.Image image = img.decodeImage(bytes)!;
-    img.Image resizedImage = img.copyResize(image, width: 300);
-    final resizedBytes = img.encodeJpg(resizedImage);
-    final resizedFile = File(file.path)..writeAsBytesSync(resizedBytes);
-    return resizedFile;
+    img.Image? image = img.decodeImage(bytes);
+    if (image != null) {
+      img.Image resizedImage = img.copyResize(
+        image,
+        width: 300,
+        height: 300,
+        interpolation: img.Interpolation.linear,
+      );
+      final resizedBytes = img.encodeJpg(resizedImage);
+      final resizedFile = File(file.path)..writeAsBytesSync(resizedBytes);
+      return resizedFile;
+    } else {
+      return file;
+    }
   }
 
   Future<String> uploadImageToStorage(File file) async {
-    final resizedFile = await _resizeImage(file);
-    final firebase_storage.FirebaseStorage storage =
-        firebase_storage.FirebaseStorage.instance;
-    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
-        .ref()
-        .child('images/$fileName');
-    firebase_storage.UploadTask uploadTask = ref.putFile(resizedFile);
-    firebase_storage.TaskSnapshot taskSnapshot =
-        await uploadTask.whenComplete(() => null);
-    String downloadUrl = await taskSnapshot.ref.getDownloadURL();
-    return downloadUrl;
+    try {
+      final resizedFile = await _resizeImage(file);
+      final firebase_storage.FirebaseStorage storage =
+          firebase_storage.FirebaseStorage.instance;
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance
+          .ref()
+          .child('images/$fileName');
+      firebase_storage.UploadTask uploadTask = ref.putFile(resizedFile);
+      firebase_storage.TaskSnapshot taskSnapshot =
+          await uploadTask.whenComplete(() => null);
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      // Handle error
+      return '';
+    }
   }
 
   @override
@@ -80,7 +92,8 @@ class _RegisterState extends State<Register> {
             appBar: AppBar(
               backgroundColor: Colors.brown[400],
               elevation: 0.0,
-              title: const Text('Sign Up to Artkins Brew Crew'),
+              title: const Text('Sign Up'),
+              centerTitle: true,
             ),
             body: Container(
               padding:

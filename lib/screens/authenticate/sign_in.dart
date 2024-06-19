@@ -34,7 +34,8 @@ class _SignInState extends State<SignIn> {
             appBar: AppBar(
               backgroundColor: Colors.brown[400],
               elevation: 0.0,
-              title: const Text('Sign In to Artkins Brew Crew'),
+              title: const Text('Sign In'),
+              centerTitle: true,
             ),
             body: Container(
               padding:
