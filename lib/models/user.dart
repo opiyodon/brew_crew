@@ -6,9 +6,12 @@ class CustomUser {
 
 class UserData {
   final String? uid;
-  final String? name;
-  final String? sugars;
-  final String? strength;
+  final String username;
+  final String? profilePicture;
 
-  UserData({this.uid, this.name, this.sugars, this.strength});
+  UserData({
+    this.uid,
+    required this.username,
+    this.profilePicture,
+  });
 }

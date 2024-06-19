@@ -5,18 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // create user obj based on firebaseUser
   CustomUser? _userFromFirebaseUser(User? user) {
-    // If user is null, we return a default CustomUser with an empty string as uid
     return user != null ? CustomUser(uid: user.uid) : null;
   }
 
-  // auth change user stream
   Stream<CustomUser?> get user {
     return _auth.authStateChanges().map(_userFromFirebaseUser);
   }
 
-  // sign in with email & password
+  // signInWithEmailAndPassword
   Future<CustomUser?> signInWithEmailAndPassword(
       String email, String password) async {
     try {
@@ -25,33 +22,39 @@ class AuthService {
       User? user = result.user;
       return _userFromFirebaseUser(user);
     } catch (e) {
-      return null; // Return null if there is an error
+      return null;
     }
   }
 
-  // register with email & password
+  // registerWithEmailAndPassword
   Future<CustomUser?> registerWithEmailAndPassword(
-      String email, String password) async {
+      String email, String password, String username, String profilePicture) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+        email: email,
+        password: password,
+      );
       User? user = result.user;
-
-      // create a new document for the user with the uid
-      await DatabaseService(uid: user!.uid).updateUserData('0', 'New Crew Member', 100);
-
+      await DatabaseService(uid: user!.uid).updateUserData(
+        username,
+        profilePicture,
+      );
+      await DatabaseService(uid: user.uid).updateBrewData(
+        '0',
+        100,
+        user.uid,
+      );
       return _userFromFirebaseUser(user);
     } catch (e) {
-      return null; // Return null if there is an error
+      return null;
     }
   }
 
-  // sign out
-  Future signOut() async {
+  Future<void> signOut() async {
     try {
-      return await _auth.signOut();
+      await _auth.signOut();
     } catch (e) {
-      return null; // Return null if there is an error
+      // Handle error
     }
   }
 }

@@ -15,13 +15,11 @@ class _SignInState extends State<SignIn> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool loading = false;
 
-  // text field state
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -29,74 +27,77 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-    return loading ? const Loading() : Scaffold(
-      backgroundColor: Colors.brown[100],
-      appBar: AppBar(
-        backgroundColor: Colors.brown[400],
-        elevation: 0.0,
-        title: const Text('Sign In to Artkins Brew Crew'),
-      ),
-      body: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(hintText: 'Email'),
-                validator: (val) => val!.isEmpty ? 'Enter an email' : null,
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(hintText: 'Password'),
-                validator: (val) =>
-                    val!.length < 6 ? 'Enter a password 6+ chars long' : null,
-              ),
-              const SizedBox(height: 20.0),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Colors.brown[400], // Set the background color here
+    return loading
+        ? const Loading()
+        : Scaffold(
+            backgroundColor: Colors.brown[100],
+            appBar: AppBar(
+              backgroundColor: Colors.brown[400],
+              elevation: 0.0,
+              title: const Text('Sign In'),
+              centerTitle: true,
+            ),
+            body: Container(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20.0),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(hintText: 'Email'),
+                      validator: (val) =>
+                          val!.isEmpty ? 'Enter an email' : null,
+                    ),
+                    const SizedBox(height: 20.0),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      decoration: const InputDecoration(hintText: 'Password'),
+                      validator: (val) => val!.length < 6
+                          ? 'Enter a password 6+ chars long'
+                          : null,
+                    ),
+                    const SizedBox(height: 20.0),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.brown[400],
+                      ),
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          setState(() => loading = true);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Processing Data')),
+                          );
+                          var result = await _auth.signInWithEmailAndPassword(
+                              _emailController.text, _passwordController.text);
+                          if (result == null) {
+                            setState(() => loading = false);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Failed to sign in')),
+                            );
+                          }
+                        }
+                      },
+                      child: const Text(
+                        'Sign In',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        widget.toggleView();
+                      },
+                      child:
+                          const Text('Don\'t have an account? Register here'),
+                    ),
+                  ],
                 ),
-                onPressed: () async {
-                  if (_formKey.currentState!.validate()) {
-                    // reset loading state
-                    setState(() => loading = true);
-                    // If the form is valid, display a Snackbar.
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
-                    );
-                    // Sign in to database
-                    var result = await _auth.signInWithEmailAndPassword(
-                        _emailController.text, _passwordController.text);
-                    if (result == null) {
-                      // reset loading state
-                      setState(() => loading = false);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Failed to sign in')),
-                      );
-                    }
-                  }
-                },
-                child: const Text(
-                  'Sign In',
-                  style: TextStyle(color: Colors.white),
-                ),
               ),
-              TextButton(
-                onPressed: () {
-                  widget.toggleView();
-                },
-                child: const Text('Don\'t have an account? Register here'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
   }
 }
