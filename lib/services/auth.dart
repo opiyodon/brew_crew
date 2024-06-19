@@ -13,6 +13,7 @@ class AuthService {
     return _auth.authStateChanges().map(_userFromFirebaseUser);
   }
 
+  // signInWithEmailAndPassword
   Future<CustomUser?> signInWithEmailAndPassword(
       String email, String password) async {
     try {
@@ -25,6 +26,7 @@ class AuthService {
     }
   }
 
+  // registerWithEmailAndPassword
   Future<CustomUser?> registerWithEmailAndPassword(
       String email, String password, String username, String profilePicture) async {
     try {
